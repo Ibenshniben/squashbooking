@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { differenceInCalendarDays } from 'date-fns'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -70,10 +71,11 @@ export async function POST(request: Request) {
   const duration = typeof durationMinutes === 'number' && durationMinutes > 0 ? durationMinutes : 60
   const end = new Date(start.getTime() + duration * 60 * 1000)
 
-  // Enforce 3-day booking window for non-admin users
-  const now = new Date()
-  const threeDaysAhead = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
-  if ((session.user.role !== 'ADMIN') && start > threeDaysAhead) {
+  // Enforce 3 calendar days window for non-admin users (inclusive of today + 3 days)
+  const today = new Date(); today.setHours(0,0,0,0)
+  const startDay = new Date(start); startDay.setHours(0,0,0,0)
+  const dayDiff = differenceInCalendarDays(startDay, today)
+  if ((session.user.role !== 'ADMIN') && dayDiff > 3) {
     return NextResponse.json({ error: 'Kan ikke booke mer enn 3 dager i forveien' }, { status: 403 })
   }
 
