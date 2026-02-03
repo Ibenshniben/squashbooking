@@ -60,30 +60,30 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json()
-  const { courtId, startTime } = body
+  const { courtId, startTime, durationMinutes } = body
 
   if (!courtId || !startTime) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
   const start = new Date(startTime)
-  const end = new Date(start.getTime() + 60 * 60 * 1000) // 1 hour duration
+  const duration = typeof durationMinutes === 'number' && durationMinutes > 0 ? durationMinutes : 60
+  const end = new Date(start.getTime() + duration * 60 * 1000)
+
+  // Enforce 3-day booking window for non-admin users
+  const now = new Date()
+  const threeDaysAhead = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
+  if ((session.user.role !== 'ADMIN') && start > threeDaysAhead) {
+    return NextResponse.json({ error: 'Kan ikke booke mer enn 3 dager i forveien' }, { status: 403 })
+  }
 
   try {
-    // Check for existing bookings
+    // Check for overlapping bookings within requested interval
     const existingBooking = await prisma.booking.findFirst({
       where: {
         courtId,
-        OR: [
-          {
-            startTime: {
-              lt: end,
-            },
-            endTime: {
-              gt: start,
-            },
-          },
-        ],
+        startTime: { lt: end },
+        endTime: { gt: start },
       },
     })
 
