@@ -145,18 +145,39 @@ export default function AdminPage() {
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
             <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <div className="inline-flex rounded-md border bg-white">
-              <button onClick={() => setTab('bookings')} className={`px-4 py-2 text-sm ${tab==='bookings'?'bg-gray-100 font-semibold':''}`}>Bookinger</button>
-              <button onClick={() => setTab('users')} className={`px-4 py-2 text-sm ${tab==='users'?'bg-gray-100 font-semibold':''}`}>Brukere</button>
+            <div className="inline-flex rounded-md border border-gray-300 bg-white shadow-sm">
+              <button
+                onClick={() => setTab('bookings')}
+                className={`px-5 py-2 text-base font-medium transition-colors ${
+                  tab==='bookings'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Se Bookinger
+              </button>
+              <button
+                onClick={() => setTab('users')}
+                className={`px-5 py-2 text-base font-medium transition-colors ${
+                  tab==='users'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Administrer Brukere
+              </button>
             </div>
           </div>
           {tab==='bookings' && (
-            <input
-              type="date"
-              value={format(date, 'yyyy-MM-dd')}
-              onChange={(e) => setDate(new Date(e.target.value))}
-              className="border rounded-md px-3 py-2"
-            />
+            <label className="flex items-center gap-2 text-gray-800">
+              <span className="text-sm font-semibold">Velg dato:</span>
+              <input
+                type="date"
+                value={format(date, 'yyyy-MM-dd')}
+                onChange={(e) => setDate(new Date(e.target.value))}
+                className="border border-blue-600 text-gray-900 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              />
+            </label>
           )}
         </div>
 
