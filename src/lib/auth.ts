@@ -42,6 +42,21 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
+        const adminEmails = new Set([
+          'ibjulian9@gmail.com',
+          'eyvinds@gmail.com',
+        ])
+
+        if (adminEmails.has(user.email ?? '')) {
+          if (user.role !== 'ADMIN') {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { role: 'ADMIN' },
+            })
+            user.role = 'ADMIN'
+          }
+        }
+
         return {
           id: user.id,
           email: user.email,
