@@ -50,6 +50,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const me = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { suspendedUntil: true }
+  })
+
+  if (me?.suspendedUntil && me.suspendedUntil > new Date()) {
+    return NextResponse.json({ error: 'Konto midlertidig utestengt' }, { status: 403 })
+  }
+
   const body = await request.json()
   const { courtId, startTime } = body
 

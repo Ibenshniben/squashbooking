@@ -45,6 +45,7 @@ model User {
   image         String?
   password      String?
   role          String    @default("USER") // USER or ADMIN
+  suspendedUntil DateTime?
   accounts      Account[]
   sessions      Session[]
   bookings      Booking[]

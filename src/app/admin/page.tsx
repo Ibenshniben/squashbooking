@@ -27,6 +27,8 @@ export default function AdminPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [date, setDate] = useState(new Date())
+  const [tab, setTab] = useState<'bookings' | 'users'>('bookings')
+  const [users, setUsers] = useState<{id:string,name:string|null,email:string|null,role:string,suspendedUntil:string|null}[]>([])
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -38,9 +40,13 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (session?.user.role === 'ADMIN') {
-      fetchBookings()
+      if (tab === 'bookings') {
+        fetchBookings()
+      } else {
+        fetchUsers()
+      }
     }
-  }, [date, session])
+  }, [date, session, tab])
 
   const fetchBookings = async () => {
     setLoading(true)
@@ -75,6 +81,58 @@ export default function AdminPage() {
     }
   }
 
+  const fetchUsers = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/admin/users')
+      const data = await res.json()
+      setUsers(data)
+    } catch (error) {
+      console.error('Failed to fetch users', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleUserDelete = async (id: string) => {
+    if (!confirm('Slette bruker?')) return
+    try {
+      const res = await fetch(`/api/admin/users?id=${id}`, { method: 'DELETE', credentials: 'include' })
+      if (res.ok) fetchUsers()
+    } catch (e) {
+      console.error('Delete user failed', e)
+    }
+  }
+
+  const handleTimeout5Days = async (id: string) => {
+    try {
+      const res = await fetch('/api/admin/users/timeout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ id, days: 5 })
+      })
+      if (res.ok) fetchUsers()
+    } catch (e) {
+      console.error('Timeout failed', e)
+    }
+  }
+
+  const toggleAdmin = async (id: string, role: string) => {
+    try {
+      const next = role === 'ADMIN' ? 'USER' : 'ADMIN'
+      const res = await fetch('/api/admin/users/role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ id, role: next })
+      })
+      if (res.ok) fetchUsers()
+    } catch (e) {
+      console.error('Role change failed', e)
+    }
+  }
+
   if (status === 'loading' || (status === 'authenticated' && session.user.role !== 'ADMIN')) {
     return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin h-8 w-8 text-blue-600" /></div>
   }
@@ -85,13 +143,21 @@ export default function AdminPage() {
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <input
-            type="date"
-            value={format(date, 'yyyy-MM-dd')}
-            onChange={(e) => setDate(new Date(e.target.value))}
-            className="border rounded-md px-3 py-2"
-          />
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <div className="inline-flex rounded-md border bg-white">
+              <button onClick={() => setTab('bookings')} className={`px-4 py-2 text-sm ${tab==='bookings'?'bg-gray-100 font-semibold':''}`}>Bookinger</button>
+              <button onClick={() => setTab('users')} className={`px-4 py-2 text-sm ${tab==='users'?'bg-gray-100 font-semibold':''}`}>Brukere</button>
+            </div>
+          </div>
+          {tab==='bookings' && (
+            <input
+              type="date"
+              value={format(date, 'yyyy-MM-dd')}
+              onChange={(e) => setDate(new Date(e.target.value))}
+              className="border rounded-md px-3 py-2"
+            />
+          )}
         </div>
 
         {loading ? (
@@ -99,50 +165,80 @@ export default function AdminPage() {
             <Loader2 className="animate-spin h-8 w-8 text-blue-600" />
           </div>
         ) : (
-          <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tid</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bane</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bruker</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Handling</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {bookings.length === 0 ? (
+          tab==='bookings' ? (
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
                   <tr>
-                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
-                      Ingen bookinger for denne dagen
-                    </td>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tid</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bane</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bruker</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Handling</th>
                   </tr>
-                ) : (
-                  bookings.map((booking) => (
-                    <tr key={booking.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {format(parseISO(booking.startTime), 'HH:mm')} - {format(parseISO(booking.endTime), 'HH:mm')}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {booking.court.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div className="font-medium text-gray-900">{booking.user.name}</div>
-                        <div>{booking.user.email}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          onClick={() => handleDelete(booking.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </td>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {bookings.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-4 text-center text-gray-500">Ingen bookinger for denne dagen</td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ) : (
+                    bookings.map((booking) => (
+                      <tr key={booking.id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {format(parseISO(booking.startTime), 'HH:mm')} - {format(parseISO(booking.endTime), 'HH:mm')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{booking.court.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <div className="font-medium text-gray-900">{booking.user.name}</div>
+                          <div>{booking.user.email}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <button onClick={() => handleDelete(booking.id)} className="text-red-600 hover:text-red-900">
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Navn</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-post</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rolle</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Suspendert til</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Handling</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {users.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-4 text-center text-gray-500">Ingen brukere</td>
+                    </tr>
+                  ) : (
+                    users.map((u) => (
+                      <tr key={u.id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{u.name ?? '-'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{u.email ?? '-'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{u.role}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{u.suspendedUntil ? format(parseISO(u.suspendedUntil), 'dd.MM.yyyy') : '-'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex gap-3 justify-end">
+                          <button onClick={() => toggleAdmin(u.id, u.role)} className="text-blue-600 hover:text-blue-900">{u.role==='ADMIN'?'Fjern admin':'Gjør admin'}</button>
+                          <button onClick={() => handleTimeout5Days(u.id)} className="text-orange-600 hover:text-orange-900">Timeout 5 dager</button>
+                          <button onClick={() => handleUserDelete(u.id)} className="text-red-600 hover:text-red-900">Slett</button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )
         )}
       </main>
     </div>

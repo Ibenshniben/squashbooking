@@ -31,10 +31,8 @@ export default function BookingPage() {
   const [bookingLoading, setBookingLoading] = useState<string | null>(null)
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/api/auth/signin')
-    }
-  }, [status, router])
+    // allow unauthenticated users to view bookings
+  }, [status])
 
   useEffect(() => {
     fetchCourts()
@@ -193,13 +191,19 @@ export default function BookingPage() {
                             {myBooking ? 'Din booking' : 'Opptatt'}
                           </div>
                         ) : (
-                          <button
-                            onClick={() => handleBooking(court.id, time)}
-                            disabled={isLoading}
-                            className="w-full h-full rounded border-2 border-dashed border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-colors flex items-center justify-center text-blue-600 font-medium disabled:opacity-50"
-                          >
-                            {isLoading ? <Loader2 className="animate-spin h-4 w-4" /> : 'Ledig'}
-                          </button>
+                          session ? (
+                            <button
+                              onClick={() => handleBooking(court.id, time)}
+                              disabled={isLoading}
+                              className="w-full h-full rounded border-2 border-dashed border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-colors flex items-center justify-center text-blue-600 font-medium disabled:opacity-50"
+                            >
+                              {isLoading ? <Loader2 className="animate-spin h-4 w-4" /> : 'Ledig'}
+                            </button>
+                          ) : (
+                            <div className="w-full h-full rounded border-2 border-dashed border-gray-200 bg-gray-50 text-gray-500 flex items-center justify-center text-sm">
+                              Logg inn for å booke
+                            </div>
+                          )
                         )}
                       </div>
                     )
