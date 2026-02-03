@@ -258,28 +258,28 @@ export default function AdminPage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-3">Gjentagende booking</h2>
               <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">Bane</label>
-                  <select value={recCourtId} onChange={(e)=>setRecCourtId(e.target.value)} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                  <label className="block text-sm text-slate-900 mb-1">Bane</label>
+                  <select value={recCourtId} onChange={(e)=>setRecCourtId(e.target.value)} className="w-full border border-slate-400 bg-white text-slate-900 rounded-md px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900">
                     {courts.map(c=> (
                       <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">Startdato</label>
-                  <input type="date" value={recDate} onChange={(e)=>setRecDate(e.target.value)} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm" />
+                  <label className="block text-sm text-slate-900 mb-1">Startdato</label>
+                  <input type="date" value={recDate} onChange={(e)=>setRecDate(e.target.value)} className="w-full border border-slate-400 bg-white text-slate-900 rounded-md px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900" />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">Tid</label>
-                  <select value={recTimeMinutes} onChange={(e)=>setRecTimeMinutes(parseInt(e.target.value,10))} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                  <label className="block text-sm text-slate-900 mb-1">Tid</label>
+                  <select value={recTimeMinutes} onChange={(e)=>setRecTimeMinutes(parseInt(e.target.value,10))} className="w-full border border-slate-400 bg-white text-slate-900 rounded-md px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900">
                     {Array.from({length: ((22-6)*2)}, (_,i)=>6*60+i*30).map(m=> (
                       <option key={m} value={m}>{String(Math.floor(m/60)).padStart(2,'0')}:{String(m%60).padStart(2,'0')}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">Varighet</label>
-                  <select value={recDuration} onChange={(e)=>setRecDuration(parseInt(e.target.value,10))} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm">
+                  <label className="block text-sm text-slate-900 mb-1">Varighet</label>
+                  <select value={recDuration} onChange={(e)=>setRecDuration(parseInt(e.target.value,10))} className="w-full border border-slate-400 bg-white text-slate-900 rounded-md px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900">
                     <option value={30}>30 min</option>
                     <option value={60}>1 time</option>
                     <option value={90}>1,5 time</option>
@@ -288,8 +288,8 @@ export default function AdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-700 mb-1">Antall uker</label>
-                  <input type="number" min={1} value={recOccurrences} onChange={(e)=>setRecOccurrences(parseInt(e.target.value,10)||1)} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm" />
+                  <label className="block text-sm text-slate-900 mb-1">Antall uker</label>
+                  <input type="number" min={1} value={recOccurrences} onChange={(e)=>setRecOccurrences(parseInt(e.target.value,10)||1)} className="w-full border border-slate-400 bg-white text-slate-900 rounded-md px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900" />
                 </div>
               </div>
               <div className="mt-3">
