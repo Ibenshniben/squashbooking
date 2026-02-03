@@ -177,39 +177,39 @@ export default function AdminPage() {
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
             <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <div className="inline-flex rounded-md border border-gray-300 bg-white shadow-sm">
+            <div className="inline-flex rounded-md border border-slate-300 bg-white shadow-sm">
               <button
                 onClick={() => setTab('bookings')}
-                className={`px-5 py-2 text-base font-medium transition-colors ${
+                className={`px-5 py-2 text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 ${
                   tab==='bookings'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                Se Bookinger
+                Bookinger
               </button>
               <button
                 onClick={() => setTab('users')}
-                className={`px-5 py-2 text-base font-medium transition-colors ${
+                className={`px-5 py-2 text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 ${
                   tab==='users'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                Administrer Brukere
+                Brukere
               </button>
             </div>
           </div>
           {tab==='bookings' && (
-            <label className="flex items-center gap-2 text-gray-800">
+            <label className="flex items-center gap-2 text-slate-900">
               <span className="text-sm font-semibold">Velg dato:</span>
               <input
                 type="date"
                 value={format(date, 'yyyy-MM-dd')}
                 onChange={(e) => setDate(new Date(e.target.value))}
-                className="border border-blue-600 text-gray-900 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="border border-slate-400 text-slate-900 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-600"
               />
-              <button onClick={handleExportCsv} className="ml-4 px-4 py-2 rounded-md bg-slate-900 text-white hover:bg-slate-800">Eksporter CSV</button>
+              <button onClick={handleExportCsv} className="ml-4 px-4 py-2 rounded-md bg-slate-900 text-white hover:bg-slate-800 font-semibold shadow-sm">Eksporter CSV</button>
             </label>
           )}
         </div>
