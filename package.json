@@ -7,7 +7,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:seed": "prisma db seed",
-    "build": "npm run prisma:generate && npm run prisma:migrate:deploy && npm run prisma:seed && next build",
+    "build": "npm run prisma:generate && prisma db push && npm run prisma:seed && next build",
     "start": "next start",
     "lint": "eslint"
   },
