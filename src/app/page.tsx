@@ -9,27 +9,22 @@ export default function Home() {
       
       <main>
         {/* Hero Section - Premium Dark Theme */}
-        <div className="relative bg-slate-900 text-white overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-slate-950 z-0" />
-          
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-blue-600/20 blur-3xl opacity-50" />
-          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 rounded-full bg-indigo-600/20 blur-3xl opacity-50" />
+        <div className="relative bg-slate-900 text-white">
           
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-48 text-center">
-            <span className="inline-block py-1 px-3 rounded-full bg-blue-900/50 border border-blue-700 text-blue-300 text-sm font-semibold mb-6 backdrop-blur-sm">
-              Sørlandets beste squash-opplevelse
+            <span className="inline-block py-1 px-3 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-sm font-semibold mb-6">
+              Søm Squash
             </span>
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-white">
-              Søm <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Squash</span>
+              Søm Squash
             </h1>
-            <p className="text-xl md:text-2xl text-slate-300 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-              Moderne fasiliteter, enkelt bookingsystem og et inkluderende miljø for alle nivåer.
+            <p className="text-xl md:text-2xl text-slate-300 mb-10 max-w-2xl mx-auto font-medium">
+              Haumyrveien 39C
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link 
                 href="/book" 
-                className="group bg-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-500 transition-all duration-300 shadow-lg shadow-blue-900/20 flex items-center"
+                className="group bg-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-500 transition-all duration-300 flex items-center"
               >
                 Book Bane Nå
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -52,9 +47,9 @@ export default function Home() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
-              <div className="group bg-slate-50 p-8 rounded-2xl border border-slate-100 hover:border-blue-100 hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
-                <div className="bg-white w-14 h-14 rounded-xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
-                  <Trophy className="h-7 w-7 text-blue-600" />
+              <div className="group bg-slate-50 p-8 rounded-2xl border border-slate-100 transition-all duration-300">
+                <div className="bg-white w-14 h-14 rounded-xl flex items-center justify-center mb-6 shadow-sm">
+                  <Trophy className="h-7 w-7 text-slate-700" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">Squashbaner</h3>
                 <p className="text-slate-600 leading-relaxed">
@@ -62,9 +57,9 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="group bg-slate-50 p-8 rounded-2xl border border-slate-100 hover:border-blue-100 hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
-                <div className="bg-white w-14 h-14 rounded-xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
-                  <Clock className="h-7 w-7 text-indigo-600" />
+              <div className="group bg-slate-50 p-8 rounded-2xl border border-slate-100 transition-all duration-300">
+                <div className="bg-white w-14 h-14 rounded-xl flex items-center justify-center mb-6 shadow-sm">
+                  <Clock className="h-7 w-7 text-slate-700" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">Åpningstider</h3>
                 <p className="text-slate-600 leading-relaxed">
@@ -72,9 +67,9 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="group bg-slate-50 p-8 rounded-2xl border border-slate-100 hover:border-blue-100 hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
-                <div className="bg-white w-14 h-14 rounded-xl flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
-                  <Calendar className="h-7 w-7 text-sky-600" />
+              <div className="group bg-slate-50 p-8 rounded-2xl border border-slate-100 transition-all duration-300">
+                <div className="bg-white w-14 h-14 rounded-xl flex items-center justify-center mb-6 shadow-sm">
+                  <Calendar className="h-7 w-7 text-slate-700" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">Booking</h3>
                 <p className="text-slate-600 leading-relaxed">

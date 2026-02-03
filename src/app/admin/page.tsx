@@ -118,6 +118,38 @@ export default function AdminPage() {
     }
   }
 
+  const handleUnsuspend = async (id: string) => {
+    try {
+      const res = await fetch('/api/admin/users/unsuspend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ id })
+      })
+      if (res.ok) fetchUsers()
+    } catch (e) {
+      console.error('Unsuspend failed', e)
+    }
+  }
+
+  const handleExportCsv = async () => {
+    try {
+      const formattedDate = format(date, 'yyyy-MM-dd')
+      const res = await fetch(`/api/admin/bookings/export?date=${formattedDate}`)
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `bookings-${formattedDate}.csv`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      console.error('Export CSV failed', e)
+    }
+  }
+
   const toggleAdmin = async (id: string, role: string) => {
     try {
       const next = role === 'ADMIN' ? 'USER' : 'ADMIN'
@@ -177,6 +209,7 @@ export default function AdminPage() {
                 onChange={(e) => setDate(new Date(e.target.value))}
                 className="border border-blue-600 text-gray-900 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
+              <button onClick={handleExportCsv} className="ml-4 px-4 py-2 rounded-md bg-slate-900 text-white hover:bg-slate-800">Eksporter CSV</button>
             </label>
           )}
         </div>
@@ -246,11 +279,22 @@ export default function AdminPage() {
                       <tr key={u.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{u.name ?? '-'}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{u.email ?? '-'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{u.role}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{u.suspendedUntil ? format(parseISO(u.suspendedUntil), 'dd.MM.yyyy') : '-'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${u.role==='ADMIN'?'bg-blue-100 text-blue-800':'bg-gray-100 text-gray-700'}`}>{u.role==='ADMIN'?'Admin':'Bruker'}</span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {u.suspendedUntil ? (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">Suspendert til {format(parseISO(u.suspendedUntil), 'dd.MM.yyyy')}</span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Aktiv</span>
+                          )}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex gap-3 justify-end">
                           <button onClick={() => toggleAdmin(u.id, u.role)} className="text-blue-600 hover:text-blue-900">{u.role==='ADMIN'?'Fjern admin':'Gjør admin'}</button>
                           <button onClick={() => handleTimeout5Days(u.id)} className="text-orange-600 hover:text-orange-900">Timeout 5 dager</button>
+                          {u.suspendedUntil && (
+                            <button onClick={() => handleUnsuspend(u.id)} className="text-green-600 hover:text-green-900">Fjern timeout</button>
+                          )}
                           <button onClick={() => handleUserDelete(u.id)} className="text-red-600 hover:text-red-900">Slett</button>
                         </td>
                       </tr>
