@@ -4,15 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:seed": "prisma db seed",
+    "build": "npm run prisma:generate && npm run prisma:migrate:deploy && npm run prisma:seed && next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
-    "@prisma/adapter-better-sqlite3": "^7.3.0",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^12.6.2",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.563.0",
@@ -34,5 +35,9 @@
     "prisma": "^5.22.0",
     "tailwindcss": "^4",
     "typescript": "^5"
+  }
+  ,
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }
