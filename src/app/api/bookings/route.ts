@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { differenceInCalendarDays } from 'date-fns'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -51,41 +50,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const me = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { suspendedUntil: true }
-  })
-
-  if (me?.suspendedUntil && me.suspendedUntil > new Date()) {
-    return NextResponse.json({ error: 'Konto midlertidig utestengt' }, { status: 403 })
-  }
-
   const body = await request.json()
-  const { courtId, startTime, durationMinutes } = body
+  const { courtId, startTime } = body
 
   if (!courtId || !startTime) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
   const start = new Date(startTime)
-  const duration = typeof durationMinutes === 'number' && durationMinutes > 0 ? durationMinutes : 60
-  const end = new Date(start.getTime() + duration * 60 * 1000)
-
-  // Enforce 3 calendar days window for non-admin users (inclusive of today + 3 days)
-  const today = new Date(); today.setHours(0,0,0,0)
-  const startDay = new Date(start); startDay.setHours(0,0,0,0)
-  const dayDiff = differenceInCalendarDays(startDay, today)
-  if ((session.user.role !== 'ADMIN') && dayDiff > 3) {
-    return NextResponse.json({ error: 'Kan ikke booke mer enn 3 dager i forveien' }, { status: 403 })
-  }
+  const end = new Date(start.getTime() + 60 * 60 * 1000) // 1 hour duration
 
   try {
-    // Check for overlapping bookings within requested interval
+    // Check for existing bookings
     const existingBooking = await prisma.booking.findFirst({
       where: {
         courtId,
-        startTime: { lt: end },
-        endTime: { gt: start },
+        OR: [
+          {
+            startTime: {
+              lt: end,
+            },
+            endTime: {
+              gt: start,
+            },
+          },
+        ],
       },
     })
 

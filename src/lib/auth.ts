@@ -1,13 +1,11 @@
 import { NextAuthOptions } from "next-auth"
-import type { Adapter } from "next-auth/adapters"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "./prisma"
 import bcrypt from "bcryptjs"
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
-  adapter: PrismaAdapter(prisma) as Adapter,
+  adapter: PrismaAdapter(prisma) as any,
   session: {
     strategy: "jwt",
   },
@@ -40,21 +38,6 @@ export const authOptions: NextAuthOptions = {
 
         if (!isPasswordValid) {
           return null
-        }
-
-        const adminEmails = new Set([
-          'ibjulian9@gmail.com',
-          'eyvinds@gmail.com',
-        ])
-
-        if (adminEmails.has(user.email ?? '')) {
-          if (user.role !== 'ADMIN') {
-            await prisma.user.update({
-              where: { id: user.id },
-              data: { role: 'ADMIN' },
-            })
-            user.role = 'ADMIN'
-          }
         }
 
         return {

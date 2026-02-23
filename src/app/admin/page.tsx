@@ -27,15 +27,6 @@ export default function AdminPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [date, setDate] = useState(new Date())
-  const [tab, setTab] = useState<'bookings' | 'users'>('bookings')
-  const [users, setUsers] = useState<{id:string,name:string|null,email:string|null,role:string,suspendedUntil:string|null}[]>([])
-  const [courts, setCourts] = useState<{id:string,name:string}[]>([])
-  const [recCourtId, setRecCourtId] = useState<string>('')
-  const [recDate, setRecDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'))
-  const [recTimeMinutes, setRecTimeMinutes] = useState<number>(18*60)
-  const [recDuration, setRecDuration] = useState<number>(60)
-  const [recOccurrences, setRecOccurrences] = useState<number>(4)
-  const [recSubmitting, setRecSubmitting] = useState<boolean>(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -47,27 +38,9 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (session?.user.role === 'ADMIN') {
-      if (tab === 'bookings') {
-        fetchBookings()
-      } else {
-        fetchUsers()
-      }
+      fetchBookings()
     }
-  }, [date, session, tab])
-
-  useEffect(() => {
-    const fetchCourts = async () => {
-      try {
-        const res = await fetch('/api/courts')
-        const data = await res.json()
-        setCourts(data)
-        if (data.length > 0) setRecCourtId(data[0].id)
-      } catch (e) {
-        console.error('Failed to fetch courts', e)
-      }
-    }
-    if (session?.user.role === 'ADMIN') fetchCourts()
-  }, [session])
+  }, [date, session])
 
   const fetchBookings = async () => {
     setLoading(true)
@@ -89,7 +62,6 @@ export default function AdminPage() {
     try {
       const res = await fetch(`/api/admin/bookings?id=${id}`, {
         method: 'DELETE',
-        credentials: 'include',
       })
 
       if (res.ok) {
@@ -99,121 +71,6 @@ export default function AdminPage() {
       }
     } catch (error) {
       console.error('Failed to delete booking', error)
-    }
-  }
-
-  const fetchUsers = async () => {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/admin/users')
-      const data = await res.json()
-      setUsers(data)
-    } catch (error) {
-      console.error('Failed to fetch users', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleUserDelete = async (id: string) => {
-    if (!confirm('Slette bruker?')) return
-    try {
-      const res = await fetch(`/api/admin/users?id=${id}`, { method: 'DELETE', credentials: 'include' })
-      if (res.ok) fetchUsers()
-    } catch (e) {
-      console.error('Delete user failed', e)
-    }
-  }
-
-  const handleTimeout5Days = async (id: string) => {
-    try {
-      const res = await fetch('/api/admin/users/timeout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ id, days: 5 })
-      })
-      if (res.ok) fetchUsers()
-    } catch (e) {
-      console.error('Timeout failed', e)
-    }
-  }
-
-  const handleUnsuspend = async (id: string) => {
-    try {
-      const res = await fetch('/api/admin/users/unsuspend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ id })
-      })
-      if (res.ok) fetchUsers()
-    } catch (e) {
-      console.error('Unsuspend failed', e)
-    }
-  }
-
-  const handleExportCsv = async () => {
-    try {
-      const formattedDate = format(date, 'yyyy-MM-dd')
-      const res = await fetch(`/api/admin/bookings/export?date=${formattedDate}`)
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `bookings-${formattedDate}.csv`
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      URL.revokeObjectURL(url)
-    } catch (e) {
-      console.error('Export CSV failed', e)
-    }
-  }
-
-  const toggleAdmin = async (id: string, role: string) => {
-    try {
-      const next = role === 'ADMIN' ? 'USER' : 'ADMIN'
-      const res = await fetch('/api/admin/users/role', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ id, role: next })
-      })
-      if (res.ok) fetchUsers()
-    } catch (e) {
-      console.error('Role change failed', e)
-    }
-  }
-
-  const handleCreateRecurring = async () => {
-    if (!recCourtId) return
-    setRecSubmitting(true)
-    try {
-      const res = await fetch('/api/admin/bookings/recurring', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          courtId: recCourtId,
-          startDate: recDate,
-          timeMinutes: recTimeMinutes,
-          durationMinutes: recDuration,
-          occurrences: recOccurrences,
-          intervalWeeks: 1
-        })
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        alert(data.error || 'Kunne ikke opprette gjentagende bookinger')
-      } else {
-        alert(`Opprettet ${data.created} bookinger. Overlapp: ${data.skipped}`)
-        fetchBookings()
-      }
-    } catch (e) {
-      console.error('Recurring create failed', e)
-    } finally {
-      setRecSubmitting(false)
     }
   }
 
@@ -227,90 +84,13 @@ export default function AdminPage() {
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-4">
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-            <div className="inline-flex rounded-md border border-slate-300 bg-white shadow-sm">
-              <button
-                onClick={() => setTab('bookings')}
-                className={`px-5 py-2 text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 ${
-                  tab==='bookings'
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-900 hover:bg-slate-100'
-                }`}
-              >
-                Bookinger
-              </button>
-              <button
-                onClick={() => setTab('users')}
-                className={`px-5 py-2 text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 ${
-                  tab==='users'
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-900 hover:bg-slate-100'
-                }`}
-              >
-                Brukere
-              </button>
-            </div>
-          </div>
-          {/* Recurring bookings form */}
-          <div className="w-full mt-6">
-            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">Gjentagende booking</h2>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                <div>
-                  <label className="block text-sm text-slate-900 mb-1">Bane</label>
-                  <select value={recCourtId} onChange={(e)=>setRecCourtId(e.target.value)} className="w-full border border-slate-400 bg-white text-slate-900 rounded-md px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900">
-                    {courts.map(c=> (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-slate-900 mb-1">Startdato</label>
-                  <input type="date" value={recDate} onChange={(e)=>setRecDate(e.target.value)} className="w-full border border-slate-400 bg-white text-slate-900 rounded-md px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900" />
-                </div>
-                <div>
-                  <label className="block text-sm text-slate-900 mb-1">Tid</label>
-                  <select value={recTimeMinutes} onChange={(e)=>setRecTimeMinutes(parseInt(e.target.value,10))} className="w-full border border-slate-400 bg-white text-slate-900 rounded-md px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900">
-                    {Array.from({length: ((22-6)*2)}, (_,i)=>6*60+i*30).map(m=> (
-                      <option key={m} value={m}>{String(Math.floor(m/60)).padStart(2,'0')}:{String(m%60).padStart(2,'0')}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-slate-900 mb-1">Varighet</label>
-                  <select value={recDuration} onChange={(e)=>setRecDuration(parseInt(e.target.value,10))} className="w-full border border-slate-400 bg-white text-slate-900 rounded-md px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900">
-                    <option value={30}>30 min</option>
-                    <option value={60}>1 time</option>
-                    <option value={90}>1,5 time</option>
-                    <option value={120}>2 timer</option>
-                    <option value={180}>3 timer</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-slate-900 mb-1">Antall uker</label>
-                  <input type="number" min={1} value={recOccurrences} onChange={(e)=>setRecOccurrences(parseInt(e.target.value,10)||1)} className="w-full border border-slate-400 bg-white text-slate-900 rounded-md px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900" />
-                </div>
-              </div>
-              <div className="mt-3">
-                <button onClick={handleCreateRecurring} disabled={recSubmitting} className="px-4 py-2 rounded-md bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50">
-                  {recSubmitting ? 'Oppretter…' : 'Opprett gjentagende'}
-                </button>
-              </div>
-            </div>
-          </div>
-          {tab==='bookings' && (
-            <label className="flex items-center gap-2 text-slate-900">
-              <span className="text-sm font-semibold">Velg dato:</span>
-              <input
-                type="date"
-                value={format(date, 'yyyy-MM-dd')}
-                onChange={(e) => setDate(new Date(e.target.value))}
-                className="border border-slate-400 text-slate-900 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-600"
-              />
-              <button onClick={handleExportCsv} className="ml-4 px-4 py-2 rounded-md bg-slate-900 text-white hover:bg-slate-800 font-semibold shadow-sm">Eksporter CSV</button>
-            </label>
-          )}
+          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+          <input
+            type="date"
+            value={format(date, 'yyyy-MM-dd')}
+            onChange={(e) => setDate(new Date(e.target.value))}
+            className="border rounded-md px-3 py-2"
+          />
         </div>
 
         {loading ? (
@@ -318,91 +98,50 @@ export default function AdminPage() {
             <Loader2 className="animate-spin h-8 w-8 text-blue-600" />
           </div>
         ) : (
-          tab==='bookings' ? (
-            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+          <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tid</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bane</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bruker</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Handling</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {bookings.length === 0 ? (
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tid</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bane</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bruker</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Handling</th>
+                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                      Ingen bookinger for denne dagen
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {bookings.length === 0 ? (
-                    <tr>
-                      <td colSpan={4} className="px-6 py-4 text-center text-gray-500">Ingen bookinger for denne dagen</td>
+                ) : (
+                  bookings.map((booking) => (
+                    <tr key={booking.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {format(parseISO(booking.startTime), 'HH:mm')} - {format(parseISO(booking.endTime), 'HH:mm')}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {booking.court.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div className="font-medium text-gray-900">{booking.user.name}</div>
+                        <div>{booking.user.email}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => handleDelete(booking.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </td>
                     </tr>
-                  ) : (
-                    bookings.map((booking) => (
-                      <tr key={booking.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {format(parseISO(booking.startTime), 'HH:mm')} - {format(parseISO(booking.endTime), 'HH:mm')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{booking.court.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <div className="font-medium text-gray-900">{booking.user.name}</div>
-                          <div>{booking.user.email}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button onClick={() => handleDelete(booking.id)} className="text-red-600 hover:text-red-900">
-                            <Trash2 className="h-5 w-5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Navn</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">E-post</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rolle</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Suspendert til</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Handling</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {users.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-gray-500">Ingen brukere</td>
-                    </tr>
-                  ) : (
-                    users.map((u) => (
-                      <tr key={u.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{u.name ?? '-'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{u.email ?? '-'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${u.role==='ADMIN'?'bg-blue-100 text-blue-800':'bg-gray-100 text-gray-700'}`}>{u.role==='ADMIN'?'Admin':'Bruker'}</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {u.suspendedUntil ? (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">Suspendert til {format(parseISO(u.suspendedUntil), 'dd.MM.yyyy')}</span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Aktiv</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex gap-3 justify-end">
-                          <button onClick={() => toggleAdmin(u.id, u.role)} className="text-blue-600 hover:text-blue-900">{u.role==='ADMIN'?'Fjern admin':'Gjør admin'}</button>
-                          <button onClick={() => handleTimeout5Days(u.id)} className="text-orange-600 hover:text-orange-900">Timeout 5 dager</button>
-                          {u.suspendedUntil && (
-                            <button onClick={() => handleUnsuspend(u.id)} className="text-green-600 hover:text-green-900">Fjern timeout</button>
-                          )}
-                          <button onClick={() => handleUserDelete(u.id)} className="text-red-600 hover:text-red-900">Slett</button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </main>
     </div>
