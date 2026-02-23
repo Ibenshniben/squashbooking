@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Account {
@@ -44,7 +45,8 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
-  role          String    @default("USER") // USER or ADMIN
+  role          String    @default("USER") // USER, ADMIN, or SUPER_ADMIN
+  bannedUntil   DateTime? // Field for bans/timeouts
   accounts      Account[]
   sessions      Session[]
   bookings      Booking[]
@@ -65,13 +67,17 @@ model Court {
 }
 
 model Booking {
-  id        String   @id @default(cuid())
-  startTime DateTime
-  endTime   DateTime
-  userId    String
-  courtId   String
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  startTime   DateTime
+  endTime     DateTime
+  userId      String
+  courtId     String
+  createdAt   DateTime @default(now())
+  isRecurring Boolean  @default(false)
+  recurringId String?  // To group recurring bookings together
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   court Court @relation(fields: [courtId], references: [id], onDelete: Cascade)
+
+  @@unique([courtId, startTime])
 }
