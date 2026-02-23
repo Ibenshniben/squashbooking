@@ -11,10 +11,7 @@ export default function Home() {
         {/* Hero Section */}
         <div className="relative py-24 md:py-32 overflow-hidden border-b border-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 flex flex-col items-center">
-            <img src="/img.png" alt="Søm Squash" className="h-48 md:h-64 w-auto object-contain mb-8 animate-in fade-in zoom-in duration-700" />
-            <h1 className="text-3xl md:text-5xl font-black mb-12 tracking-tighter uppercase italic text-gray-900 leading-tight">
-              Velkommen til <br /> <span className="text-blue-600">Søm Squashklubb</span>
-            </h1>
+            <img src="/img.png" alt="Søm Squash" className="h-64 md:h-80 w-auto object-contain mb-16 animate-in fade-in zoom-in duration-700" />
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
               <Link 
                 href="/book" 
