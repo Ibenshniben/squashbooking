@@ -374,7 +374,7 @@ export default function AdminPage() {
                           )}
                         </td>
                         <td className="px-8 py-6 whitespace-nowrap">
-                          {session.user.role === 'SUPER_ADMIN' && user.id !== session.user.id ? (
+                          {session?.user.role === 'SUPER_ADMIN' && user.id !== session?.user.id ? (
                             <select
                               value={user.role}
                               onChange={(e) => handleRoleChange(user.id, e.target.value)}
@@ -396,7 +396,7 @@ export default function AdminPage() {
                         </td>
                         <td className="px-8 py-6 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-2">
-                            {(session.user.role === 'SUPER_ADMIN' || user.role === 'USER') && user.id !== session.user.id && (
+                            {(session?.user.role === 'SUPER_ADMIN' || user.role === 'USER') && user.id !== session?.user.id && (
                               <>
                                 {isBanned ? (
                                   <button

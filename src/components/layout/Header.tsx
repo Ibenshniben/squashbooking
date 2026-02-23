@@ -16,8 +16,12 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           <div className="flex items-center">
-            <Link href="/" className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-black text-gray-900 tracking-tighter uppercase italic">Søm Squash</span>
+            <Link href="/" className="flex-shrink-0 flex items-center gap-3">
+              <img src="/img.png" alt="Søm Squash Logo" className="h-12 w-auto object-contain" />
+              <div className="flex flex-col">
+                <span className="text-sm font-black text-gray-900 tracking-tighter uppercase leading-none">Søm</span>
+                <span className="text-sm font-black text-blue-600 tracking-tighter uppercase leading-none">Squash</span>
+              </div>
             </Link>
           </div>
 

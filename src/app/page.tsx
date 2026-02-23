@@ -10,11 +10,12 @@ export default function Home() {
       <main>
         {/* Hero Section */}
         <div className="relative py-24 md:py-32 overflow-hidden border-b border-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h1 className="text-5xl md:text-7xl font-black mb-12 tracking-tighter uppercase italic text-gray-900 leading-tight">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 flex flex-col items-center">
+            <img src="/img.png" alt="Søm Squash" className="h-48 md:h-64 w-auto object-contain mb-8 animate-in fade-in zoom-in duration-700" />
+            <h1 className="text-3xl md:text-5xl font-black mb-12 tracking-tighter uppercase italic text-gray-900 leading-tight">
               Velkommen til <br /> <span className="text-blue-600">Søm Squashklubb</span>
             </h1>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
               <Link 
                 href="/book" 
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-gray-900 text-white px-12 py-6 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition-all duration-300 shadow-2xl shadow-black/10 active:scale-95"

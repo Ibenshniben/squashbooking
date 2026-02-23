@@ -6,7 +6,7 @@ import { format, addDays, startOfToday, isSameDay, parseISO, addMinutes, isAfter
 import { nb } from 'date-fns/locale'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Loader2, Calendar, Clock, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Loader2, Calendar, Clock, CheckCircle2, AlertCircle, Trash2 } from 'lucide-react'
 
 interface Court {
   id: string
