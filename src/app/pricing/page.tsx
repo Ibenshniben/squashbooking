@@ -71,9 +71,6 @@ export default function PricingPage() {
                     <td className="px-8 py-10">
                       <div className="flex flex-col">
                         <span className="text-lg font-black uppercase italic tracking-tighter text-gray-900">{plan.name}</span>
-                        {plan.highlight && (
-                          <span className="text-[9px] font-black bg-blue-600 text-white px-2 py-0.5 rounded-full w-fit mt-2 uppercase tracking-widest">Anbefalt</span>
-                        )}
                       </div>
                     </td>
                     <td className="px-8 py-10">

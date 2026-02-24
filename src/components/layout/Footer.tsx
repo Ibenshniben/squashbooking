@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <footer className="bg-white border-t border-gray-100 py-16 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Contact */}
           <div>
             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-900 mb-6 italic">Kontakt</h3>
@@ -33,15 +33,6 @@ export function Footer() {
                 <span className="text-xs font-bold text-gray-500 uppercase">Lørdag - Søndag</span>
                 <span className="text-sm font-black text-gray-900">09.00 - 22.00</span>
               </div>
-            </div>
-          </div>
-          
-          {/* Org Info */}
-          <div className="flex flex-col md:items-end">
-            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-900 mb-6 italic">Informasjon</h3>
-            <div className="bg-gray-50 p-6 rounded-[2rem] border border-gray-100 w-full max-w-[240px]">
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Org. nr</p>
-              <p className="text-sm font-black text-gray-900 tabular-nums tracking-tighter">998 672 260</p>
             </div>
           </div>
         </div>
