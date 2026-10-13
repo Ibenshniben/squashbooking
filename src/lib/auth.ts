@@ -23,7 +23,7 @@ export const authOptions: NextAuthOptions = {
       })
 
       if (dbUser?.bannedUntil && new Date(dbUser.bannedUntil) > new Date()) {
-        throw new Error(`Kontoen din er utestengt til ${new Date(dbUser.bannedUntil).toLocaleDateString('no-NO')}`)
+        return `/login?error=Banned&until=${encodeURIComponent(new Date(dbUser.bannedUntil).toISOString())}`
       }
       return true
     },
