@@ -9,40 +9,50 @@ import { Loader2, AlertCircle, ShieldCheck } from 'lucide-react'
 function LoginForm() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
+  const callbackUrl = searchParams.get('callbackUrl') || '/book'
+  const bannedUntil = searchParams.get('until')
+  const bannedDate = bannedUntil && !Number.isNaN(new Date(bannedUntil).getTime())
+    ? new Date(bannedUntil).toLocaleDateString('no-NO')
+    : null
+
+  const errorMessage =
+    error === 'Banned'
+      ? `Kontoen din er utestengt${bannedDate ? ` til ${bannedDate}` : ''}. Kontakt klubben hvis du mener dette er feil.`
+      : error === 'OAuthCallback' || error === 'OAuthSignin'
+        ? 'Kunne ikke koble til Google. Prøv igjen, eller kontakt administrator.'
+        : error === 'OAuthAccountNotLinked'
+          ? 'E-postadressen er allerede registrert med en annen innloggingsmetode.'
+          : 'Noe gikk galt under innlogging. Prøv igjen.'
   const [loading, setLoading] = useState(false)
 
   const handleGoogleSignIn = async () => {
     setLoading(true)
     try {
-      await signIn('google', { callbackUrl: '/' })
-    } catch (err) {
+      await signIn('google', { callbackUrl })
+    } catch {
       setLoading(false)
     }
   }
 
   return (
-    <div className="w-full max-w-md space-y-10 p-12 bg-white rounded-[3rem] shadow-[0_30px_100px_rgba(0,0,0,0.08)] border border-gray-100">
+    <div className="w-full max-w-md space-y-10 p-8 sm:p-12 bg-white rounded-[2.5rem] sm:rounded-[3rem] shadow-[0_30px_100px_rgba(0,0,0,0.08)] border border-gray-100">
       <div className="text-center">
         <div className="inline-flex items-center justify-center p-4 bg-blue-50 rounded-3xl mb-6">
-          <ShieldCheck className="h-10 w-10 text-blue-600" />
+          <ShieldCheck className="h-10 w-10 text-blue-600" aria-hidden="true" />
         </div>
-        <h2 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">
+        <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase italic">
           Velkommen
-        </h2>
-        <p className="mt-4 text-xs font-black text-gray-400 uppercase tracking-[0.2em]">
+        </h1>
+        <p className="mt-4 text-xs font-black text-gray-500 uppercase tracking-[0.2em]">
           Logg inn for å booke squash-bane
         </p>
       </div>
 
       <div className="space-y-6">
         {error && (
-          <div className="rounded-2xl bg-red-50 p-5 flex items-start gap-3 border border-red-100">
-            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
-            <div className="text-xs font-black text-red-900 uppercase tracking-widest leading-relaxed">
-              {error === 'OAuthCallback' 
-                ? 'Kunne ikke koble til Google. Kontakt administrator.'
-                : 'Noe gikk galt under innlogging.'}
-            </div>
+          <div role="alert" className="rounded-2xl bg-red-50 p-5 flex items-start gap-3 border border-red-100">
+            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 shrink-0" aria-hidden="true" />
+            <p className="text-sm font-bold text-red-900 leading-relaxed">{errorMessage}</p>
           </div>
         )}
 
@@ -54,7 +64,7 @@ function LoginForm() {
           {loading ? (
             <Loader2 className="animate-spin h-5 w-5" />
           ) : (
-            <svg className="h-5 w-5" viewBox="0 0 24 24">
+            <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                 fill="currentColor"
@@ -76,7 +86,7 @@ function LoginForm() {
           <span>Fortsett med Google</span>
         </button>
 
-        <p className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest pt-4">
+        <p className="text-center text-[11px] font-bold text-gray-500 uppercase tracking-widest pt-4">
           Trygg innlogging med Google OAuth 2.0
         </p>
       </div>

@@ -48,6 +48,15 @@ export async function PATCH(request: Request) {
     const targetUser = await prisma.user.findUnique({ where: { id: userId } })
     if (!targetUser) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
+    if (role && !['USER', 'ADMIN', 'SUPER_ADMIN'].includes(role)) {
+      return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
+    }
+
+    // Nobody can change their own role or ban themselves
+    if (targetUser.id === session.user.id) {
+      return NextResponse.json({ error: 'You cannot modify your own account here' }, { status: 403 })
+    }
+
     // Only SUPER_ADMIN can change roles
     if (role && session.user.role !== 'SUPER_ADMIN') {
       return NextResponse.json({ error: 'Only Super Admins can change roles' }, { status: 403 })
@@ -63,7 +72,8 @@ export async function PATCH(request: Request) {
       data: {
         bannedUntil: bannedUntil !== undefined ? (bannedUntil ? new Date(bannedUntil) : null) : undefined,
         role: role || undefined
-      }
+      },
+      select: { id: true, name: true, email: true, role: true, bannedUntil: true, image: true }
     })
 
     return NextResponse.json(updatedUser)

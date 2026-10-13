@@ -120,6 +120,7 @@ export default function AdminPage() {
       }
     } catch (error) {
       console.error('Fast booking failed', error)
+      alert('Fikk ikke kontakt med serveren. Prøv igjen.')
     } finally {
       setLoading(false)
     }
@@ -217,7 +218,7 @@ export default function AdminPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
           <div>
             <h1 className="text-4xl font-black tracking-tighter uppercase italic text-gray-900">Dashboard</h1>
-            <p className="text-gray-900 text-xs font-black uppercase tracking-widest mt-1">Administrasjon v2.1</p>
+            <p className="text-gray-600 text-xs font-black uppercase tracking-widest mt-1">Administrasjon</p>
           </div>
           
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -232,7 +233,7 @@ export default function AdminPage() {
             <div className="flex bg-gray-50 p-1.5 rounded-xl border-2 border-gray-100 w-full md:w-auto">
               <button
                 onClick={() => setActiveTab('bookings')}
-                className={`flex-1 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all ${
                   activeTab === 'bookings' ? 'bg-white text-blue-600 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-900'
                 }`}
               >
@@ -241,7 +242,7 @@ export default function AdminPage() {
               </button>
               <button
                 onClick={() => setActiveTab('users')}
-                className={`flex-1 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all ${
                   activeTab === 'users' ? 'bg-white text-blue-600 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-900'
                 }`}
               >
@@ -262,7 +263,8 @@ export default function AdminPage() {
               <input
                 type="date"
                 value={format(date, 'yyyy-MM-dd')}
-                onChange={(e) => setDate(new Date(e.target.value))}
+                onChange={(e) => e.target.value && setDate(new Date(e.target.value))}
+                aria-label="Velg dato"
                 className="bg-white border-2 border-gray-100 rounded-xl px-5 py-3 text-sm font-black text-gray-900 shadow-sm focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none transition-all cursor-pointer w-full sm:w-auto"
               />
             </div>
@@ -273,19 +275,19 @@ export default function AdminPage() {
               </div>
             ) : (
               <div className="bg-white rounded-[2.5rem] border border-gray-200 overflow-x-auto shadow-2xl shadow-black/5">
-                <table className="min-w-[700px] divide-y divide-gray-100">
+                <table className="w-full min-w-[700px] divide-y divide-gray-100">
                   <thead className="bg-gray-50/50">
                     <tr>
-                      <th className="px-8 py-6 text-left text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Tidspunkt</th>
-                      <th className="px-8 py-6 text-left text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Bane</th>
-                      <th className="px-8 py-6 text-left text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Medlem</th>
-                      <th className="px-8 py-6 text-right text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Handlinger</th>
+                      <th scope="col" className="px-8 py-6 text-left text-[11px] font-black text-gray-900 uppercase tracking-[0.2em]">Tidspunkt</th>
+                      <th scope="col" className="px-8 py-6 text-left text-[11px] font-black text-gray-900 uppercase tracking-[0.2em]">Bane</th>
+                      <th scope="col" className="px-8 py-6 text-left text-[11px] font-black text-gray-900 uppercase tracking-[0.2em]">Medlem</th>
+                      <th scope="col" className="px-8 py-6 text-right text-[11px] font-black text-gray-900 uppercase tracking-[0.2em]">Handlinger</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {bookings.length === 0 ? (
                       <tr>
-                        <td colSpan={4} className="px-8 py-24 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">
+                        <td colSpan={4} className="px-8 py-24 text-center text-gray-500 font-bold uppercase tracking-widest text-xs">
                           Ingen bookinger funnet for denne dagen
                         </td>
                       </tr>
@@ -293,7 +295,7 @@ export default function AdminPage() {
                       bookings.map((booking) => (
                         <tr key={booking.id} className="hover:bg-gray-50/30 transition-colors">
                           <td className="px-8 py-6 whitespace-nowrap">
-                            <span className="bg-gray-900 text-white px-4 py-2.5 rounded-xl text-[10px] font-black tracking-widest border border-gray-800 shadow-md">
+                            <span className="bg-gray-900 text-white px-4 py-2.5 rounded-xl text-[11px] font-black tracking-widest border border-gray-800 shadow-md">
                               {format(parseISO(booking.startTime), 'HH:mm')} - {format(parseISO(booking.endTime), 'HH:mm')}
                             </span>
                           </td>
@@ -304,14 +306,15 @@ export default function AdminPage() {
                           </td>
                           <td className="px-8 py-6 whitespace-nowrap">
                             <div className="flex flex-col">
-                              <span className="text-sm font-black text-gray-900 leading-tight">{booking.user.name}</span>
-                              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{booking.user.email}</span>
+                              <span className="text-sm font-black text-gray-900 leading-tight">{booking.user?.name}</span>
+                              <span className="text-xs font-medium text-gray-600">{booking.user?.email}</span>
                             </div>
                           </td>
                           <td className="px-8 py-6 whitespace-nowrap text-right">
                             <button
                               onClick={() => handleDeleteBooking(booking.id)}
-                              className="p-3.5 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all border border-transparent hover:border-red-100"
+                              aria-label="Slett booking"
+                              className="p-3.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all border border-transparent hover:border-red-100"
                             >
                               <Trash2 className="h-5 w-5" />
                             </button>
@@ -331,13 +334,13 @@ export default function AdminPage() {
             <h2 className="text-xl font-black uppercase tracking-tighter italic text-gray-900">Brukeroversikt</h2>
 
             <div className="bg-white rounded-[2.5rem] border border-gray-200 overflow-x-auto shadow-2xl shadow-black/5">
-              <table className="min-w-[800px] divide-y divide-gray-100">
+              <table className="w-full min-w-[800px] divide-y divide-gray-100">
                 <thead className="bg-gray-50/50">
                   <tr>
-                    <th className="px-8 py-6 text-left text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Profil</th>
-                    <th className="px-8 py-6 text-left text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Status</th>
-                    <th className="px-8 py-6 text-left text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Rolle</th>
-                    <th className="px-8 py-6 text-right text-[10px] font-black text-gray-900 uppercase tracking-[0.2em]">Handling</th>
+                    <th scope="col" className="px-8 py-6 text-left text-[11px] font-black text-gray-900 uppercase tracking-[0.2em]">Profil</th>
+                    <th scope="col" className="px-8 py-6 text-left text-[11px] font-black text-gray-900 uppercase tracking-[0.2em]">Status</th>
+                    <th scope="col" className="px-8 py-6 text-left text-[11px] font-black text-gray-900 uppercase tracking-[0.2em]">Rolle</th>
+                    <th scope="col" className="px-8 py-6 text-right text-[11px] font-black text-gray-900 uppercase tracking-[0.2em]">Handling</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -356,18 +359,18 @@ export default function AdminPage() {
                             )}
                             <div className="flex flex-col">
                               <span className="text-sm font-black text-gray-900 leading-tight">{user.name}</span>
-                              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{user.email}</span>
+                              <span className="text-xs font-medium text-gray-600">{user.email}</span>
                             </div>
                           </div>
                         </td>
                         <td className="px-8 py-6 whitespace-nowrap">
                           {isBanned ? (
-                            <div className="flex items-center gap-2 text-[10px] font-black text-red-600 bg-red-50 px-4 py-2 rounded-full border border-red-100 w-fit uppercase tracking-widest">
+                            <div className="flex items-center gap-2 text-[11px] font-black text-red-600 bg-red-50 px-4 py-2 rounded-full border border-red-100 w-fit uppercase tracking-widest">
                               <Ban className="h-3 w-3" />
                               Bannet til {format(parseISO(user.bannedUntil!), 'dd.MM')}
                             </div>
                           ) : (
-                            <div className="flex items-center gap-2 text-[10px] font-black text-green-600 bg-green-50 px-4 py-2 rounded-full border border-green-100 w-fit uppercase tracking-widest">
+                            <div className="flex items-center gap-2 text-[11px] font-black text-green-600 bg-green-50 px-4 py-2 rounded-full border border-green-100 w-fit uppercase tracking-widest">
                               <CheckCircle className="h-3 w-3" />
                               Aktiv Bruker
                             </div>
@@ -378,14 +381,14 @@ export default function AdminPage() {
                             <select
                               value={user.role}
                               onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                              className="text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none focus:ring-4 focus:ring-blue-50 cursor-pointer transition-all"
+                              className="text-[11px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl border border-gray-200 bg-white outline-none focus:ring-4 focus:ring-blue-50 cursor-pointer transition-all"
                             >
                               <option value="USER">USER</option>
                               <option value="ADMIN">ADMIN</option>
                               <option value="SUPER_ADMIN">SUPER_ADMIN</option>
                             </select>
                           ) : (
-                            <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl border-2 shadow-sm ${
+                            <span className={`text-[11px] font-black uppercase tracking-widest px-4 py-2 rounded-xl border-2 shadow-sm ${
                               user.role === 'SUPER_ADMIN' ? 'text-red-700 bg-red-50 border-red-100' :
                               user.role === 'ADMIN' ? 'text-blue-700 bg-blue-50 border-blue-100' : 
                               'text-gray-900 bg-gray-50 border-gray-200'
@@ -401,20 +404,22 @@ export default function AdminPage() {
                                 {isBanned ? (
                                   <button
                                     onClick={() => handleBanUser(user.id, null)}
-                                    className="text-[10px] font-black text-blue-600 hover:bg-blue-600 hover:text-white px-5 py-3 rounded-xl transition-all border-2 border-blue-100 hover:border-blue-600 uppercase tracking-widest"
+                                    className="text-[11px] font-black text-blue-600 hover:bg-blue-600 hover:text-white px-5 py-3 rounded-xl transition-all border-2 border-blue-100 hover:border-blue-600 uppercase tracking-widest"
                                   >
                                     Opphev
                                   </button>
                                 ) : (
                                   <div className="flex items-center gap-1.5">
-                                    <button onClick={() => handleBanUser(user.id, 1)} className="p-3 text-gray-300 hover:text-orange-600 hover:bg-orange-50 rounded-2xl transition-all border border-transparent hover:border-orange-100" title="Timeout 1 dag"><Clock className="h-4.5 w-4.5" /></button>
-                                    <button onClick={() => handleBanUser(user.id, 3)} className="p-3 text-gray-300 hover:text-orange-600 hover:bg-orange-50 rounded-2xl transition-all border border-transparent hover:border-orange-100" title="Timeout 3 dager"><ShieldAlert className="h-4.5 w-4.5" /></button>
-                                    <button onClick={() => handleBanUser(user.id, 5)} className="p-3 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all border border-transparent hover:border-red-100" title="Timeout 5 dager"><Ban className="h-4.5 w-4.5" /></button>
+                                    <button onClick={() => handleBanUser(user.id, 1)} aria-label="Timeout 1 dag" className="p-3 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-2xl transition-all border border-transparent hover:border-orange-100" title="Timeout 1 dag"><Clock className="h-[18px] w-[18px]" /></button>
+                                    <button onClick={() => handleBanUser(user.id, 3)} aria-label="Timeout 3 dager" className="p-3 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-2xl transition-all border border-transparent hover:border-orange-100" title="Timeout 3 dager"><ShieldAlert className="h-[18px] w-[18px]" /></button>
+                                    <button onClick={() => handleBanUser(user.id, 5)} aria-label="Timeout 5 dager" className="p-3 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all border border-transparent hover:border-red-100" title="Timeout 5 dager"><Ban className="h-[18px] w-[18px]" /></button>
                                   </div>
                                 )}
                                 <button
                                   onClick={() => handleDeleteUser(user.id)}
-                                  className="p-3.5 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all border border-transparent hover:border-red-100"
+                                  aria-label={`Slett ${user.name ?? 'bruker'}`}
+                                  title="Slett bruker"
+                                  className="p-3.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all border border-transparent hover:border-red-100"
                                 >
                                   <Trash2 className="h-5 w-5" />
                                 </button>
@@ -434,11 +439,12 @@ export default function AdminPage() {
 
       {/* Fast Booking Modal */}
       {showFastBooking && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[3rem] w-full max-w-xl p-10 shadow-2xl animate-in zoom-in-95 duration-300 relative border border-gray-100 overflow-y-auto max-h-[90vh]">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[2rem] sm:rounded-[3rem] w-full max-w-xl p-6 sm:p-10 shadow-2xl animate-pop relative border border-gray-100 overflow-y-auto max-h-[90vh]">
             <button 
               onClick={() => setShowFastBooking(false)}
-              className="absolute top-8 right-8 p-3 hover:bg-gray-100 rounded-2xl transition-colors text-gray-900"
+              aria-label="Lukk"
+              className="absolute top-4 right-4 sm:top-8 sm:right-8 p-3 hover:bg-gray-100 rounded-2xl transition-colors text-gray-900"
             >
               <X className="h-6 w-6" />
             </button>
@@ -448,27 +454,29 @@ export default function AdminPage() {
                 <Zap className="h-7 w-7 text-blue-600 fill-blue-600" />
                 <h3 className="text-3xl font-black tracking-tighter uppercase italic text-gray-900">Intervall-booking</h3>
               </div>
-              <p className="text-gray-900 text-xs font-black uppercase tracking-widest opacity-40">Opprett gjentakende økter</p>
+              <p className="text-gray-600 text-xs font-black uppercase tracking-widest">Book på vegne av et medlem</p>
             </div>
 
             <form onSubmit={handleFastBooking} className="space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-900 ml-1">Bruker</label>
+                  <label htmlFor="fb-user" className="text-[11px] font-black uppercase tracking-widest text-gray-900 ml-1">Bruker</label>
                   <select
+                    id="fb-user"
                     required
                     className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-600 transition-all cursor-pointer"
                     value={fastBookingData.userId}
                     onChange={(e) => setFastBookingData({...fastBookingData, userId: e.target.value})}
                   >
-                    <option value="">Søk etter medlem...</option>
+                    <option value="">Velg medlem...</option>
                     {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.email})</option>)}
                   </select>
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-900 ml-1">Bane</label>
+                  <label htmlFor="fb-court" className="text-[11px] font-black uppercase tracking-widest text-gray-900 ml-1">Bane</label>
                   <select
+                    id="fb-court"
                     required
                     className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-600 transition-all cursor-pointer"
                     value={fastBookingData.courtId}
@@ -480,8 +488,9 @@ export default function AdminPage() {
                 </div>
 
                 <div className="space-y-3 sm:col-span-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-900 ml-1">Tidspunkt</label>
+                  <label htmlFor="fb-start" className="text-[11px] font-black uppercase tracking-widest text-gray-900 ml-1">Tidspunkt</label>
                   <input
+                    id="fb-start"
                     type="datetime-local"
                     required
                     className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-600 transition-all cursor-pointer"
@@ -491,14 +500,15 @@ export default function AdminPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-900 ml-1">Økter (30min stk)</label>
+                  <label htmlFor="fb-slots" className="text-[11px] font-black uppercase tracking-widest text-gray-900 ml-1">Økter (30min stk)</label>
                   <input
+                    id="fb-slots"
                     type="number"
                     min="1"
                     max="10"
                     className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-600 transition-all"
                     value={fastBookingData.slots}
-                    onChange={(e) => setFastBookingData({...fastBookingData, slots: parseInt(e.target.value)})}
+                    onChange={(e) => setFastBookingData({...fastBookingData, slots: parseInt(e.target.value) || 1})}
                   />
                 </div>
 
@@ -510,20 +520,21 @@ export default function AdminPage() {
                       checked={fastBookingData.isRecurring}
                       onChange={(e) => setFastBookingData({...fastBookingData, isRecurring: e.target.checked})}
                     />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-900 group-hover:text-blue-600 transition-colors">Fast Gjentakelse</span>
+                    <span className="text-[11px] font-black uppercase tracking-widest text-gray-900 group-hover:text-blue-600 transition-colors">Fast Gjentakelse</span>
                   </label>
                 </div>
 
                 {fastBookingData.isRecurring && (
-                  <div className="space-y-3 sm:col-span-2 animate-in slide-in-from-top-4 duration-300">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-900 ml-1">Antall uker (1-52)</label>
+                  <div className="space-y-3 sm:col-span-2 animate-slide-down">
+                    <label htmlFor="fb-weeks" className="text-[11px] font-black uppercase tracking-widest text-gray-900 ml-1">Antall uker (1-52)</label>
                     <input
+                    id="fb-weeks"
                       type="number"
                       min="1"
                       max="52"
                       className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-5 py-4 text-sm font-black outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-600 transition-all"
                       value={fastBookingData.weeks}
-                      onChange={(e) => setFastBookingData({...fastBookingData, weeks: parseInt(e.target.value)})}
+                      onChange={(e) => setFastBookingData({...fastBookingData, weeks: parseInt(e.target.value) || 1})}
                     />
                   </div>
                 )}

@@ -1,16 +1,17 @@
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
 
-// This is the default NextAuth middleware
+// Redirects signed-out visitors to /login for the routes in the matcher below
 export default withAuth(
-  function middleware(req) {
-    // Optional: Log here to see if middleware is running
-    // console.log("Middleware running for:", req.nextUrl.pathname)
+  function proxy() {
     return NextResponse.next()
   },
   {
     callbacks: {
       authorized: ({ token }) => !!token,
+    },
+    pages: {
+      signIn: '/login',
     },
   }
 )
