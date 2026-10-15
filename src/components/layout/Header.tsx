@@ -16,19 +16,10 @@ export function Header() {
   const { data: session } = useSession()
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
+  const [avatarFailed, setAvatarFailed] = useState(false)
 
   const isAdmin = session?.user.role === 'ADMIN' || session?.user.role === 'SUPER_ADMIN'
   const visibleLinks = links.filter(link => !link.adminOnly || isAdmin)
-
-  const handleDeleteAccount = async () => {
-    if (!confirm('Vil du slette kontoen din og alle bookingene dine? Dette kan ikke angres.')) return
-    const res = await fetch('/api/users/me', { method: 'DELETE' })
-    if (res.ok) {
-      signOut({ callbackUrl: '/' })
-    } else {
-      alert('Kunne ikke slette kontoen. Prøv igjen senere.')
-    }
-  }
 
   return (
     <header className="bg-white border-b border-gray-200">
@@ -59,22 +50,36 @@ export function Header() {
             })}
 
             {session ? (
-              <div className="flex items-center gap-4 pl-4 ml-2 border-l border-gray-200">
-                <div className="flex flex-col text-right max-w-[220px]">
-                  <span className="text-xs font-black text-gray-900 leading-tight uppercase tracking-tight truncate">{session.user.name}</span>
-                  <span className="text-[11px] font-medium text-gray-500 mt-0.5 truncate">{session.user.email}</span>
-                  <button
-                    onClick={handleDeleteAccount}
-                    className="self-end text-[11px] font-bold text-red-600 hover:text-red-700 hover:underline underline-offset-2 mt-1 transition-colors"
-                  >
-                    Slett konto
-                  </button>
+              <div className="ml-2 flex items-center gap-4 border-l border-gray-200 pl-5">
+                <div className="flex max-w-[260px] min-w-0 items-center gap-3 py-2">
+                  {session.user.image && !avatarFailed ? (
+                    <img
+                      src={session.user.image}
+                      alt=""
+                      referrerPolicy="no-referrer"
+                      onError={() => setAvatarFailed(true)}
+                      className="h-11 w-11 shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden="true"
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-700"
+                    >
+                      {(session.user.name?.trim().charAt(0) || 'K').toLocaleUpperCase('nb-NO')}
+                    </span>
+                  )}
+                  <div className="flex min-w-0 flex-col text-left">
+                    <span className="truncate text-xs font-extrabold leading-tight text-gray-900">{session.user.name || 'Konto'}</span>
+                    {session.user.email && (
+                      <span className="mt-0.5 truncate text-[11px] font-medium text-gray-500">{session.user.email}</span>
+                    )}
+                  </div>
                 </div>
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}
-                  className="flex items-center gap-2 bg-gray-900 hover:bg-red-600 text-white px-4 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-colors shadow-xl shadow-black/5"
+                  className="flex min-h-12 items-center gap-2 rounded-xl bg-gray-900 px-4 text-[11px] font-black uppercase tracking-widest text-white transition-colors hover:bg-gray-700 focus-visible:outline-offset-4"
                 >
-                  <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
+                  <LogOut className="h-4 w-4" aria-hidden="true" />
                   <span>Logg ut</span>
                 </button>
               </div>
@@ -120,23 +125,37 @@ export function Header() {
           ))}
 
           {session ? (
-            <div className="pt-4 border-t border-gray-100 mt-4 space-y-4">
-              <div className="px-4">
-                <p className="text-sm font-black text-gray-900 uppercase tracking-tight truncate">{session.user.name}</p>
-                <p className="text-xs font-medium text-gray-500 mt-0.5 truncate">{session.user.email}</p>
+            <div className="mt-4 space-y-4 border-t border-gray-100 pt-4">
+              <div className="flex min-w-0 items-center gap-3 px-4">
+                {session.user.image && !avatarFailed ? (
+                  <img
+                    src={session.user.image}
+                    alt=""
+                    referrerPolicy="no-referrer"
+                    onError={() => setAvatarFailed(true)}
+                    className="h-11 w-11 shrink-0 rounded-full object-cover"
+                  />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-700"
+                  >
+                    {(session.user.name?.trim().charAt(0) || 'K').toLocaleUpperCase('nb-NO')}
+                  </span>
+                )}
+                <div className="flex min-w-0 flex-col">
+                  <p className="truncate text-sm font-bold text-gray-900">{session.user.name || 'Konto'}</p>
+                  {session.user.email && (
+                    <p className="mt-0.5 truncate text-xs font-medium text-gray-500">{session.user.email}</p>
+                  )}
+                </div>
               </div>
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
-                className="flex items-center justify-center gap-3 w-full px-4 py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] text-white bg-gray-900 hover:bg-red-600 transition-colors shadow-xl shadow-black/10"
+                className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gray-900 px-4 py-4 text-xs font-black uppercase tracking-[0.2em] text-white transition-colors hover:bg-gray-700"
               >
                 <LogOut className="h-5 w-5" aria-hidden="true" />
                 <span>Logg ut</span>
-              </button>
-              <button
-                onClick={handleDeleteAccount}
-                className="block w-full text-center py-3 text-xs font-bold text-red-600 hover:underline underline-offset-2"
-              >
-                Slett min konto
               </button>
             </div>
           ) : (

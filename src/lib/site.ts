@@ -2,14 +2,14 @@ const rawUrl =
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`) ||
   process.env.NEXTAUTH_URL ||
-  'http://localhost:3000'
+  'https://somsquash.no'
 
 export const site = {
   url: rawUrl.replace(/\/$/, ''),
   name: 'Søm Squash',
   legalName: 'Søm Squashklubb',
   description:
-    'Book squashbane hos Søm Squashklubb i Kristiansand. Se ledige tider, priser og medlemskap, og reserver bane på nett.',
+    'Book squashbane hos Søm Squashklubb, en squashhall på Søm i Kristiansand på Sørlandet. Se ledige tider, priser og medlemskap, og reserver bane på nett.',
   contactName: 'Eyvind Strømsvåg',
   phone: '+4791372666',
   phoneDisplay: '913 72 666',
