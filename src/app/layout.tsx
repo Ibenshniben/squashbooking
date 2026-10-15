@@ -18,24 +18,24 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} – Book squashbane i ${site.city}`,
+    default: `Squashhall i ${site.city} – Book bane på Søm | ${site.name}`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
   applicationName: site.name,
-  keywords: ["squash", "squash Kristiansand", "Søm squash", "book squashbane", "squashklubb", "squashbane Søm"],
+  keywords: ["squash Kristiansand", "squashhall Kristiansand", "Søm Squash", "book squashbane", "squash på Sørlandet"],
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "nb_NO",
     url: "/",
     siteName: site.name,
-    title: `${site.name} – Book squashbane i ${site.city}`,
+    title: `Squashhall i ${site.city} – Book bane på Søm | ${site.name}`,
     description: site.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} – Book squashbane i ${site.city}`,
+    title: `Squashhall i ${site.city} – Book bane på Søm | ${site.name}`,
     description: site.description,
   },
   robots: { index: true, follow: true },
